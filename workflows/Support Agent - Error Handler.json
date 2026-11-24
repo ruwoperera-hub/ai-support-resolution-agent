@@ -1,0 +1,70 @@
+{
+  "name": "Support Agent - Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7cac888e-975f-43ca-a090-2435877305b4",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "tableId": "audit_log",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "=step",
+              "fieldValue": "={{ JSON.stringify({ workflow: $json.workflow.name, failed_node: $json.execution.lastNodeExecuted, message: $json.execution.error.message, execution_id: $json.execution.id }) }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b6cd7dc7-af32-4d54-b5fe-0e60604c5dde",
+      "name": "Log Error",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pipUsWrITGIX80vi",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "587db8c4-476c-4fd9-9079-14dc1c46c897",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "62acba298d6ddcd4158fa9734c639952c0a8e7200959b4763c33d2847c6c21fa"
+  },
+  "nodeGroups": [],
+  "id": "WSdk4fIdw3t5lAIh",
+  "tags": []
+}

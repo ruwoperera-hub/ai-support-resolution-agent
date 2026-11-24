@@ -1,0 +1,173 @@
+{
+  "name": "KB Ingestion",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5f28e1ca-1a27-48b9-9dc6-2deb6849cb55",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "kb_chunks",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3ef9b777-4961-4e2f-8ec1-223f8cd653bb",
+      "name": "Get KB Chunks",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pipUsWrITGIX80vi",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"content\": { \"parts\": [ { \"text\": $json.content } ] },\n  \"outputDimensionality\": 768\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        432,
+        0
+      ],
+      "id": "48f3547a-1f30-4820-97c5-399d3ff4f9b6",
+      "name": "Embed Chunk",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VuGULmqBxxKSUAql",
+          "name": "Gemini API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "kb_chunks",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "embedding",
+              "fieldValue": "={{ $json.embedding }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ],
+      "id": "1fe21961-3d0a-4255-bd0b-873ea834d6df",
+      "name": "Save Embedding",
+      "credentials": {
+        "supabaseApi": {
+          "id": "pipUsWrITGIX80vi",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const chunks = $('Get KB Chunks').all();\n\nreturn $input.all().map((item, i) => ({\n  json: {\n    id: chunks[i].json.id,\n    embedding: JSON.stringify(item.json.embedding.values)\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        0
+      ],
+      "id": "7b09680c-a2b1-47c0-9457-d8dc722c6323",
+      "name": "Prepare Update"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get KB Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get KB Chunks": {
+      "main": [
+        [
+          {
+            "node": "Embed Chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embed Chunk": {
+      "main": [
+        [
+          {
+            "node": "Prepare Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Update": {
+      "main": [
+        [
+          {
+            "node": "Save Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "dc2ab66d-fbb2-4946-9407-834f8ceb2041",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "62acba298d6ddcd4158fa9734c639952c0a8e7200959b4763c33d2847c6c21fa"
+  },
+  "nodeGroups": [],
+  "id": "ig43alQrEVsy1ZU4",
+  "tags": []
+}
