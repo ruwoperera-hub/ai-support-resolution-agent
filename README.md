@@ -4,7 +4,8 @@ An AI support agent that does more than write replies. For every customer messag
 
 Built with **n8n, Google Gemini, Supabase (PostgreSQL + pgvector), JavaScript and Docker**.
 
-> Demo video: _add link_  |  Author: _your name_  |  Contact: _email or profile link_
+> Demo video:https://youtu.be/qilOj3G3xkk  |  Author:Arutha Ruwoshan Perera  |  Contact:arutharuwo@gmail.com
+
 
 ---
 
